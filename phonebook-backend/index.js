@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+
 let persons = [
   {
     id: 1,
@@ -24,6 +26,10 @@ let persons = [
   },
 ];
 
+const generateId = () => {
+  return Math.floor(Math.random() * 10000000);
+};
+
 app.get("/info", (req, res) => {
   res.send(
     `<p>Phonebook has info for ${persons.length} people</p><p>${Date()}</p>`
@@ -32,6 +38,29 @@ app.get("/info", (req, res) => {
 
 app.get("/api/persons", (req, res) => {
   res.json(persons);
+});
+
+app.post("/api/persons", (req, res) => {
+  const body = req.body;
+
+  if (!body.name || !body.number) {
+    return res.status(400).json({ error: "name or number is missing" });
+  }
+  if (persons.some((person) => person.name === body.name)) {
+    return res
+      .status(400)
+      .json({ error: "name must be unique (it already exists on phonebook)" });
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId(),
+  };
+
+  persons = persons.concat(person);
+
+  res.json(person);
 });
 
 app.get("/api/persons/:id", (req, res) => {
