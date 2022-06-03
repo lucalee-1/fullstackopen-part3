@@ -1,7 +1,29 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 
+morgan.token("reqData", (req, res) => {
+  return JSON.stringify(req.body);
+});
+
 app.use(express.json());
+app.use(
+  morgan("tiny", {
+    skip: (req, res) => {
+      return req.method === "POST";
+    },
+  })
+);
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :reqData",
+    {
+      skip: (req, res) => {
+        return req.method !== "POST";
+      },
+    }
+  )
+);
 
 let persons = [
   {
