@@ -1,6 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
-const cors = require("cors")
+const cors = require("cors");
 const app = express();
 
 morgan.token("reqData", (req, res) => {
@@ -8,7 +8,8 @@ morgan.token("reqData", (req, res) => {
 });
 
 app.use(express.json());
-app.use(cors())
+app.use(cors());
+app.use(express.static("build"));
 app.use(
   morgan("tiny", {
     skip: (req, res) => {
