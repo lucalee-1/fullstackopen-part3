@@ -32,29 +32,6 @@ app.use(
   )
 );
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
 app.get("/info", (req, res) => {
   res.send(
     `<p>Phonebook has info for ${persons.length} people</p><p>${Date()}</p>`
@@ -107,10 +84,19 @@ app.get("/api/persons/:id", (req, res, next) => {
   }
 });
 
-app.delete("/api/persons/:id", async (req, res, next) => {
-  const id = req.params.id;
+app.put("/api/persons/:id", async (req, res, next) => {
   try {
-    const result = await Person.findByIdAndDelete(id);
+    const person = {number: req.body.number}
+    const updatedPerson = await Person.findByIdAndUpdate(req.params.id, person, {new: true})
+    res.json(updatedPerson)
+  } catch (err) {
+   next(err) 
+  }
+})
+
+app.delete("/api/persons/:id", async (req, res, next) => {
+  try {
+    const result = await Person.findByIdAndDelete(req.params.id);
     res.status(204).end();
   } catch (err) {
     next(err);
