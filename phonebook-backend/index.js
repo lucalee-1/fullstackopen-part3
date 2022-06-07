@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const { errorHandler } = require("./middleware");
 const Person = require("./models/person");
 
 const app = express();
@@ -60,46 +61,63 @@ app.get("/info", (req, res) => {
   );
 });
 
-app.get("/api/persons", async (req, res) => {
-  const persons = await Person.find({});
-  res.json(persons);
+app.get("/api/persons", async (req, res, next) => {
+  try {
+    const persons = await Person.find({});
+    res.json(persons);
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.post("/api/persons", async (req, res) => {
+app.post("/api/persons", async (req, res, next) => {
   const body = req.body;
+  try {
+    if (!body.name || !body.number) {
+      return res.status(400).json({ error: "name or number is missing" });
+    }
+    if (persons.some((person) => person.name === body.name)) {
+      return res.status(400).json({
+        error: "name must be unique (it already exists on phonebook)",
+      });
+    }
+    const person = new Person({
+      name: body.name,
+      number: body.number,
+    });
+    const savedPerson = await person.save();
 
-  if (!body.name || !body.number) {
-    return res.status(400).json({ error: "name or number is missing" });
+    res.json(savedPerson);
+  } catch (err) {
+    next(err);
   }
-  if (persons.some((person) => person.name === body.name)) {
-    return res
-      .status(400)
-      .json({ error: "name must be unique (it already exists on phonebook)" });
-  }
-
-  const person = new Person({
-    name: body.name,
-    number: body.number,
-  });
-
-  const savedPerson = await person.save();
-  res.json(savedPerson);
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-     if (!person) {
-    return res.status(404).end();
+
+  try {
+    const person = persons.find((person) => person.id === id);
+    if (!person) {
+      return res.status(404).end();
+    }
+    res.json(person);
+  } catch (err) {
+    next(err);
   }
-  res.json(person);
 });
 
-app.delete("/api/persons/:id", async (req, res) => {
-  const id = req.params.id
-  const result = await Person.findByIdAndDelete(id)
-  res.status(204).end();
+app.delete("/api/persons/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const result = await Person.findByIdAndDelete(id);
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
