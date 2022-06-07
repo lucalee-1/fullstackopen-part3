@@ -32,10 +32,15 @@ app.use(
   )
 );
 
-app.get("/info", (req, res) => {
-  res.send(
-    `<p>Phonebook has info for ${persons.length} people</p><p>${Date()}</p>`
-  );
+app.get("/info", async (req, res) => {
+  try {
+    const persons = await Person.find({});
+    res.send(
+      `<p>Phonebook has info for ${persons.length} people</p><p>${Date()}</p>`
+    );
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.get("/api/persons", async (req, res, next) => {
@@ -53,11 +58,6 @@ app.post("/api/persons", async (req, res, next) => {
     if (!body.name || !body.number) {
       return res.status(400).json({ error: "name or number is missing" });
     }
-    if (persons.some((person) => person.name === body.name)) {
-      return res.status(400).json({
-        error: "name must be unique (it already exists on phonebook)",
-      });
-    }
     const person = new Person({
       name: body.name,
       number: body.number,
@@ -70,11 +70,9 @@ app.post("/api/persons", async (req, res, next) => {
   }
 });
 
-app.get("/api/persons/:id", (req, res, next) => {
-  const id = Number(req.params.id);
-
+app.get("/api/persons/:id", async (req, res, next) => {
   try {
-    const person = persons.find((person) => person.id === id);
+    const person = await Person.findById(req.params.id);
     if (!person) {
       return res.status(404).end();
     }
@@ -86,13 +84,17 @@ app.get("/api/persons/:id", (req, res, next) => {
 
 app.put("/api/persons/:id", async (req, res, next) => {
   try {
-    const person = {number: req.body.number}
-    const updatedPerson = await Person.findByIdAndUpdate(req.params.id, person, {new: true})
-    res.json(updatedPerson)
+    const person = { number: req.body.number };
+    const updatedPerson = await Person.findByIdAndUpdate(
+      req.params.id,
+      person,
+      { new: true }
+    );
+    res.json(updatedPerson);
   } catch (err) {
-   next(err) 
+    next(err);
   }
-})
+});
 
 app.delete("/api/persons/:id", async (req, res, next) => {
   try {
