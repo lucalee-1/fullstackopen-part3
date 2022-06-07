@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const Person = require("./models/person")
+const Person = require("./models/person");
 
 const app = express();
 
@@ -54,10 +54,6 @@ let persons = [
   },
 ];
 
-const generateId = () => {
-  return Math.floor(Math.random() * 10000000);
-};
-
 app.get("/info", (req, res) => {
   res.send(
     `<p>Phonebook has info for ${persons.length} people</p><p>${Date()}</p>`
@@ -65,11 +61,11 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", async (req, res) => {
-  const persons = await Person.find({})
-  res.json(persons)
+  const persons = await Person.find({});
+  res.json(persons);
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", async (req, res) => {
   const body = req.body;
 
   if (!body.name || !body.number) {
@@ -81,15 +77,13 @@ app.post("/api/persons", (req, res) => {
       .json({ error: "name must be unique (it already exists on phonebook)" });
   }
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(),
-  };
+  });
 
-  persons = persons.concat(person);
-
-  res.json(person);
+  const savedPerson = await person.save();
+  res.json(savedPerson);
 });
 
 app.get("/api/persons/:id", (req, res) => {
