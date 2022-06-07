@@ -87,17 +87,17 @@ app.post("/api/persons", async (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  id = Number(req.params.id);
+  const id = Number(req.params.id);
   const person = persons.find((person) => person.id === id);
-  if (!person) {
+     if (!person) {
     return res.status(404).end();
   }
   res.json(person);
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-  id = Number(req.params.id);
-  persons = persons.filter((person) => person.id !== id);
+app.delete("/api/persons/:id", async (req, res) => {
+  const id = req.params.id
+  const result = await Person.findByIdAndDelete(id)
   res.status(204).end();
 });
 
