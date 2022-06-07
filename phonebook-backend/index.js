@@ -1,6 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const Person = require("./models/person")
+
 const app = express();
 
 morgan.token("reqData", (req, res) => {
@@ -61,8 +64,9 @@ app.get("/info", (req, res) => {
   );
 });
 
-app.get("/api/persons", (req, res) => {
-  res.json(persons);
+app.get("/api/persons", async (req, res) => {
+  const persons = await Person.find({})
+  res.json(persons)
 });
 
 app.post("/api/persons", (req, res) => {
