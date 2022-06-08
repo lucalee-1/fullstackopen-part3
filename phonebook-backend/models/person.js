@@ -15,7 +15,7 @@ const connectDB = async () => {
 connectDB();
 
 mongoose.connection.on("error", (err) => {
-  logError(err);
+  console.log(err);
 });
 
 const validatorFunc = (val) => {
