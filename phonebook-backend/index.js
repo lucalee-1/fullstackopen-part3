@@ -56,15 +56,22 @@ app.post("/api/persons", async (req, res, next) => {
   const body = req.body;
   try {
     if (!body.name || !body.number) {
-      return res.status(400).json({ error: "name or number is missing" });
+      return res.status(400).json({ error: "name or number is missing" }).end();
+    }   
+
+    if (await Person.findOne({ name: body.name })) {
+      return res.status(409).json({
+        error: "this name has already been used, name must be unique",
+      }).end();
     }
+
     const person = new Person({
       name: body.name,
       number: body.number,
     });
     const savedPerson = await person.save();
-
     res.json(savedPerson);
+
   } catch (err) {
     next(err);
   }
@@ -92,6 +99,7 @@ app.put("/api/persons/:id", async (req, res, next) => {
     );
     res.json(updatedPerson);
   } catch (err) {
+    console.log(err);
     next(err);
   }
 });
