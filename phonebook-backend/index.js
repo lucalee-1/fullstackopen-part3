@@ -32,10 +32,6 @@ app.use(
   )
 );
 
-app.get("/", (req,res) => {
-  res.send("root")
-})
-
 app.get("/info", async (req, res) => {
   try {
     const persons = await Person.find({});
