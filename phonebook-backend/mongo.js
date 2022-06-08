@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const password = process.argv[2];
 const name = process.argv[3];
@@ -11,13 +11,13 @@ const personSchema = new mongoose.Schema({
   number: String,
 });
 
-const Person = mongoose.model("Person", personSchema);
+const Person = mongoose.model('Person', personSchema);
 
 mongoose.connect(url);
 
 const displayAll = async () => {
   const persons = await Person.find({});
-  console.log("phonebook:");
+  console.log('phonebook:');
   persons.forEach((person) => {
     console.log(person.name, person.number);
   });
@@ -35,10 +35,8 @@ const seedDB = async () => {
 };
 
 const argMissing = () => {
-  console.log(
-    "Password, name and number are required: node mongo.js <password> <name> <number>"
-  );
-  console.log("Or, to display all entries: node mongo.js <password>");
+  console.log('Password, name and number are required: node mongo.js <password> <name> <number>');
+  console.log('Or, to display all entries: node mongo.js <password>');
   process.exit(1);
 };
 
