@@ -11,9 +11,9 @@ morgan.token("reqData", (req, res) => {
   return JSON.stringify(req.body);
 });
 
+app.use(express.static("build"));
 app.use(express.json());
 app.use(cors());
-app.use(express.static("build"));
 app.use(
   morgan("tiny", {
     skip: (req, res) => {
