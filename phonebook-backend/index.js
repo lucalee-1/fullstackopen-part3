@@ -84,11 +84,11 @@ app.get("/api/persons/:id", async (req, res, next) => {
 
 app.put("/api/persons/:id", async (req, res, next) => {
   try {
-    const person = { number: req.body.number };
+    const { number } = req.body;
     const updatedPerson = await Person.findByIdAndUpdate(
       req.params.id,
-      person,
-      { new: true }
+      { number },
+      { new: true, runValidators: true, context: "query" }
     );
     res.json(updatedPerson);
   } catch (err) {
